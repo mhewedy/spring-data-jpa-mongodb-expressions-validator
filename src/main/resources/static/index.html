@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expressions Validator</title>
+</head>
+<body>
+
+<h3>
+    <a href="https://github.com/mhewedy/spring-data-jpa-mongodb-expressions">Spring Data JPA MongoDB Expressions</a>
+    Validator
+</h3>
+
+<textarea id="queryText" cols="100" rows="20">{}</textarea>
+<br/>
+<button id="validateBtn">validate</button>
+
+<br/>
+<br/>
+<div id="errorDiv" style="white-space: pre-wrap; color: darkred"></div>
+
+<script>
+
+    document.querySelector("#validateBtn").addEventListener("click", async function () {
+        document.querySelector("#errorDiv").textContent = "";
+
+        let expressions = document.querySelector("#queryText").value;
+
+        let response = await fetch("/api/v1/validate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: expressions
+        });
+
+        if (response.status === 200) {
+            alert("Congratulations, your expression doesn't seem to have problems!");
+        } else {
+            let r = await response.json();
+            console.log(r);
+            document.querySelector("#errorDiv").textContent = r.error;
+        }
+    })
+
+</script>
+
+</body>
+</html>
