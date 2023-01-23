@@ -35,7 +35,7 @@ class Controller(
 ) {
 
     @PostMapping("/api/v1/validate")
-    fun validate(@RequestBody expressionsString: String): ResponseEntity<ErrorResponse> {
+    fun validate(@RequestBody expressionsString: String): ResponseEntity<Response> {
 
         val expressions: Expressions
 
@@ -43,7 +43,7 @@ class Controller(
             expressions = objectMapper.readValue(expressionsString, Expressions::class.java)
         } catch (ex: Exception) {
             return badRequest().body(
-                ErrorResponse("Invalid Request: " + ex.message)
+                Response(error = "Invalid Request: " + ex.message)
             )
         }
 
@@ -51,20 +51,27 @@ class Controller(
             testRepository.findAll(expressions)
         } catch (ex: Exception) {
             if (ex.message?.contains(INVALID_ATTR_PREFIX) == true) {
-                println("parsing success!")
-                return ok().build()
+                return success(expressions)
             } else if (ex.message?.contains(INVALID_OPERATOR_PREFIX) == true) {
                 return badRequest().body(
-                    ErrorResponse("Invalid operator: " + ex.message?.removePrefix(INVALID_OPERATOR_PREFIX))
+                    Response(error = "Invalid operator: " + ex.message?.removePrefix(INVALID_OPERATOR_PREFIX))
                 )
             }
         }
+        return success(expressions)
+    }
+
+    private fun success(expressions: Expressions): ResponseEntity<Response> {
         println("parsing success!")
-        return ok().build()
+        return ok().body(
+            Response(
+                success = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(expressions)
+            )
+        )
     }
 }
 
-data class ErrorResponse(val error: String?)
+data class Response(val error: String = "", val success: String = "")
 
 
 @Entity

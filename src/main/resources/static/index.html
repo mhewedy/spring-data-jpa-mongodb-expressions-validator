@@ -18,10 +18,12 @@
 <br/>
 <br/>
 <div id="errorDiv" style="white-space: pre-wrap; color: darkred"></div>
+<div id="successDiv" style="white-space: pre-wrap"></div>
 
 <script>
 
     document.querySelector("#validateBtn").addEventListener("click", async function () {
+        document.querySelector("#successDiv").textContent = "";
         document.querySelector("#errorDiv").textContent = "";
 
         let expressions = document.querySelector("#queryText").value;
@@ -35,7 +37,9 @@
         });
 
         if (response.status === 200) {
-            alert("Congratulations, your expression doesn't seem to have problems!");
+            let r = await response.json();
+            document.querySelector("#successDiv").textContent =
+                "Congratulations, your expression doesn't seem to have problems!\n\nResult Expression: \n\n" + r.success;
         } else {
             let r = await response.json();
             console.log(r);
