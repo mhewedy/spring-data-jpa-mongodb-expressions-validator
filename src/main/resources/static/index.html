@@ -7,8 +7,8 @@
 <body>
 
 <h3>
-    <a href="https://github.com/mhewedy/spring-data-jpa-mongodb-expressions">Spring Data JPA MongoDB Expressions</a>
-    Validator
+    <a href="https://github.com/mhewedy/spring-data-jpa-mongodb-expressions" target="_blank">Spring Data JPA MongoDB
+        Expressions</a> Validator
 </h3>
 
 <textarea id="queryText" cols="100" rows="20">{}</textarea>
@@ -43,7 +43,10 @@
         } else {
             let r = await response.json();
             console.log(r);
-            document.querySelector("#errorDiv").textContent = r.error;
+            document.querySelector("#errorDiv").innerHTML = "Expression error," +
+                " <a href='https://mhewedy.github.io/spring-data-jpa-mongodb-expressions/#_queries' target='_blank'>" +
+                "check the docs</a> for more about the query language" +
+                "\n\nError details:\n\n" + r.error;
         }
     })
 
