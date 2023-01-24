@@ -38,8 +38,8 @@
 
         if (response.status === 200) {
             let r = await response.json();
-            document.querySelector("#successDiv").textContent =
-                "Congratulations, your expression doesn't seem to have problems!\n\nResult Expression: \n\n" + r.success;
+            document.querySelector("#successDiv").innerHTML =
+                "The expression seems to have no problems, parsed expression is:\n" + r.success;
         } else {
             let r = await response.json();
             console.log(r);

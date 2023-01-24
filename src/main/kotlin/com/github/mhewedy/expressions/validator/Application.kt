@@ -6,6 +6,7 @@ import com.github.mhewedy.expressions.ExpressionsRepository
 import com.github.mhewedy.expressions.ExpressionsRepositoryImpl
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
@@ -34,6 +35,8 @@ class Controller(
     val testRepository: TestRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(this.javaClass)
+
     @PostMapping("/api/v1/validate")
     fun validate(@RequestBody expressionsString: String): ResponseEntity<Response> {
 
@@ -42,6 +45,7 @@ class Controller(
         try {
             expressions = objectMapper.readValue(expressionsString, Expressions::class.java)
         } catch (ex: Exception) {
+            log.error(ex.message)
             return badRequest().body(
                 Response(error = "Invalid Request: " + ex.message)
             )
@@ -53,6 +57,7 @@ class Controller(
             if (ex.message?.contains(INVALID_ATTR_PREFIX) == true) {
                 return success(expressions)
             } else if (ex.message?.contains(INVALID_OPERATOR_PREFIX) == true) {
+                log.error(ex.message)
                 return badRequest().body(
                     Response(error = "Invalid operator: " + ex.message?.removePrefix(INVALID_OPERATOR_PREFIX))
                 )
@@ -62,7 +67,7 @@ class Controller(
     }
 
     private fun success(expressions: Expressions): ResponseEntity<Response> {
-        println("parsing success!")
+        log.info("parsing success for the expression: {}", expressions)
         return ok().body(
             Response(
                 success = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(expressions)
@@ -72,7 +77,6 @@ class Controller(
 }
 
 data class Response(val error: String = "", val success: String = "")
-
 
 @Entity
 data class TestEntity(@Id val id: Int? = null)
